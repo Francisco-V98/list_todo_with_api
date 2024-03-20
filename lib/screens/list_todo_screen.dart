@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:list_todo_with_api/infrastructure/models/item_todo.dart';
 import 'package:list_todo_with_api/widgets/widgets.dart';
 
 class ListToDoScreen extends StatefulWidget {
@@ -12,72 +13,56 @@ class ListToDoScreen extends StatefulWidget {
   State<ListToDoScreen> createState() => _ListToDoScreenState();
 }
 
-class RemoteService {
-  Future<List<ItemToDo>?> getItems() async {
-    try {
-      var dio = Dio();
-      var response =
-          await dio.get('https://jsonplaceholder.typicode.com/todos');
-
-      if (response.statusCode == 200) {
-        var json = response.data;
-        return itemToDoFromJson(json);
-      }
-      return null;
-    } catch (e) {
-      print('Error: $e');
-      return null;
-    }
-  }
-}
-
 class _ListToDoScreenState extends State<ListToDoScreen> {
-  List<ItemToDo>? itemToDo;
+  List<dynamic> itemToDo = [];
   var isLoaded = false;
 
   @override
   void initState() {
     super.initState();
 
-    //fetch data from API
     getData();
   }
 
-  getData() async {
-    itemToDo = await RemoteService().getItems();
-    if (itemToDo != null) {
-      setState(() {
-        isLoaded = true;
-      });
+  Future<void> getData() async {
+    try {
+      Response<String> response =
+          await Dio().get('https://jsonplaceholder.typicode.com/todos');
+
+      if (response.statusCode == 200) {
+        List<dynamic> jsonData = json.decode(response.data!);
+        setState(() {
+          itemToDo = jsonData;
+        });
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 228, 220, 220),
+      backgroundColor: const Color.fromARGB(255, 237, 237, 237),
       body: SafeArea(
         child: Column(
           children: [
             Container(
-              color: const Color.fromARGB(255, 255, 255, 255),
+              color: Colors.white,
               child: dateData(),
             ),
-            isLoaded
-                ? Expanded(
-                    child: ListView.builder(
-                      itemCount: itemToDo!.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return CardListToDo(
-                          title: itemToDo![index].title,
-                          completed: itemToDo![index].completed,
-                        );
-                      },
-                    ),
-                  )
-                : const Center(heightFactor: 15,
-                    child: CircularProgressIndicator(),
-                  ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: itemToDo.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return CardListToDo(
+                    title: itemToDo[index]['title'],
+                    completed: itemToDo[index]['completed'],
+                  );
+                },
+              ),
+            )
           ],
         ),
       ),

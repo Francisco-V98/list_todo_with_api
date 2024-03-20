@@ -14,15 +14,15 @@ class CardListToDo extends StatefulWidget {
 }
 
 class _CardListToDoState extends State<CardListToDo> {
-  bool? isCompleted = false;
+  bool? isCompleted;
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      height: 56,
+      // height: 56,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        color: Colors.white,
+        color: const Color.fromARGB(255, 255, 255, 255),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -35,11 +35,14 @@ class _CardListToDoState extends State<CardListToDo> {
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Row(
           children: [
-            Text(
-              widget.title,
-              style: const TextStyle(
-                fontSize: 18,
-                color: Color.fromARGB(255, 72, 72, 82),
+            SizedBox(
+              width: 230,
+              child: Text(
+                widget.title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Color.fromARGB(255, 72, 72, 82),
+                ),
               ),
             ),
             const Spacer(),
@@ -50,7 +53,7 @@ class _CardListToDoState extends State<CardListToDo> {
                   isCompleted = value;
                 });
               },
-            )
+            ),
           ],
         ),
       ),
