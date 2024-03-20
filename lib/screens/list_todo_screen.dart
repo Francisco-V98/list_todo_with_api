@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:list_todo_with_api/infrastructure/models/item_todo.dart';
@@ -14,18 +12,44 @@ class ListToDoScreen extends StatefulWidget {
   State<ListToDoScreen> createState() => _ListToDoScreenState();
 }
 
+class RemoteService {
+  Future<List<ItemToDo>?> getItems() async {
+    try {
+      var dio = Dio();
+      var response =
+          await dio.get('https://jsonplaceholder.typicode.com/todos');
+
+      if (response.statusCode == 200) {
+        var json = response.data;
+        return itemToDoFromJson(json);
+      }
+      return null;
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+}
+
 class _ListToDoScreenState extends State<ListToDoScreen> {
-  // var itemToDo;
+  List<ItemToDo>? itemToDo;
+  var isLoaded = false;
 
   @override
   void initState() {
     super.initState();
-    getItemToDo();
+
+    //fetch data from API
+    getData();
   }
 
-  void getItemToDo() async {
-    final response = await Dio().get('https://jsonplaceholder.typicode.com/todos');
-    
+  getData() async {
+    itemToDo = await RemoteService().getItems();
+    if (itemToDo != null) {
+      setState(() {
+        isLoaded = true;
+      });
+    }
   }
 
   @override
@@ -39,17 +63,21 @@ class _ListToDoScreenState extends State<ListToDoScreen> {
               color: const Color.fromARGB(255, 255, 255, 255),
               child: dateData(),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 3,
-                itemBuilder: (BuildContext context, int index) {
-                  return CardListToDo(
-                    title: 'hola',
-                    completed: false,
-                  );
-                },
-              ),
-            )
+            isLoaded
+                ? Expanded(
+                    child: ListView.builder(
+                      itemCount: itemToDo!.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return CardListToDo(
+                          title: itemToDo![index].title,
+                          completed: itemToDo![index].completed,
+                        );
+                      },
+                    ),
+                  )
+                : const Center(heightFactor: 15,
+                    child: CircularProgressIndicator(),
+                  ),
           ],
         ),
       ),

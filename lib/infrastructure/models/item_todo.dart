@@ -1,3 +1,10 @@
+import 'dart:convert';
+
+
+List<ItemToDo> itemToDoFromJson(String str) => List<ItemToDo>.from(json.decode(str).map((x) => ItemToDo.fromJson(x)));
+
+String itemToDoToJson(List<ItemToDo> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
 class ItemToDo {
     final int userId;
     final int id;
