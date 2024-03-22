@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:list_todo_with_api/infrastructure/models/item_todo.dart';
+import 'package:list_todo_with_api/screens/post_screen.dart';
 import 'package:list_todo_with_api/widgets/widgets.dart';
 
 class ListToDoScreen extends StatefulWidget {
@@ -41,25 +42,43 @@ class _ListToDoScreenState extends State<ListToDoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PostScreen(),
+            ),
+          );
+        },
+        backgroundColor: Colors.amber,
+        child: const Icon(Icons.swap_horiz),
+      ),
       backgroundColor: const Color.fromARGB(255, 237, 237, 237),
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
             Container(
-              color: Colors.white,
+              color: Colors.amber,
               child: dateData(),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: itemsToDo.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return CardListToDo(
-                    title: itemsToDo[index].title!,
-                    completed: itemsToDo[index].completed,
-                  );
-                },
-              ),
-            )
+            itemsToDo.isEmpty
+                ? const Center(
+                    heightFactor: 16,
+                    child: CircularProgressIndicator(),
+                  )
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: itemsToDo.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return CardListToDo(
+                          title: itemsToDo[index].title!,
+                          completed: itemsToDo[index].completed,
+                        );
+                      },
+                    ),
+                  )
           ],
         ),
       ),
@@ -68,7 +87,7 @@ class _ListToDoScreenState extends State<ListToDoScreen> {
 
   Padding dateData() {
     return const Padding(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.only(top: 32, left: 16, bottom: 16, right: 16),
       child: Row(
         children: [
           Text(
