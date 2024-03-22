@@ -1,7 +1,6 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:list_todo_with_api/infrastructure/models/item_todo.dart';
 import 'package:list_todo_with_api/widgets/widgets.dart';
 
 class ListToDoScreen extends StatefulWidget {
@@ -14,7 +13,7 @@ class ListToDoScreen extends StatefulWidget {
 }
 
 class _ListToDoScreenState extends State<ListToDoScreen> {
-  List<dynamic> itemsToDo = [];
+  List<ItemToDo> itemsToDo = [];
 
   @override
   void initState() {
@@ -28,8 +27,9 @@ class _ListToDoScreenState extends State<ListToDoScreen> {
       Response response = await Dio().get(url);
 
       if (response.statusCode == 200) {
+        List<dynamic> jsonData = response.data;
         setState(() {
-          itemsToDo = response.data;
+          itemsToDo = jsonData.map((item) => ItemToDo.fromJson(item)).toList();
         });
       }
     } catch (e) {
@@ -37,23 +37,6 @@ class _ListToDoScreenState extends State<ListToDoScreen> {
       print('Error: $e');
     }
   }
-
-  // Future<void> getData() async {
-  //   try {
-  //     Response<String> response =
-  //         await Dio().get('https://jsonplaceholder.typicode.com/todos');
-
-  //     if (response.statusCode == 200) {
-  //       List<dynamic> jsonData = json.decode(response.data!);
-  //       setState(() {
-  //         itemToDo = jsonData;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     // ignore: avoid_print
-  //     print('Error: $e');
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -71,8 +54,8 @@ class _ListToDoScreenState extends State<ListToDoScreen> {
                 itemCount: itemsToDo.length,
                 itemBuilder: (BuildContext context, int index) {
                   return CardListToDo(
-                    title: itemsToDo[index]['title'],
-                    completed: itemsToDo[index]['completed'],
+                    title: itemsToDo[index].title!,
+                    completed: itemsToDo[index].completed,
                   );
                 },
               ),
