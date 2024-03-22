@@ -14,25 +14,22 @@ class ListToDoScreen extends StatefulWidget {
 }
 
 class _ListToDoScreenState extends State<ListToDoScreen> {
-  List<dynamic> itemToDo = [];
-  var isLoaded = false;
+  List<dynamic> itemsToDo = [];
 
   @override
   void initState() {
     super.initState();
-
     getData();
   }
 
-  Future<void> getData() async {
+  Future getData() async {
+    const url = 'https://jsonplaceholder.typicode.com/todos';
     try {
-      Response<String> response =
-          await Dio().get('https://jsonplaceholder.typicode.com/todos');
+      Response response = await Dio().get(url);
 
       if (response.statusCode == 200) {
-        List<dynamic> jsonData = json.decode(response.data!);
         setState(() {
-          itemToDo = jsonData;
+          itemsToDo = response.data;
         });
       }
     } catch (e) {
@@ -40,6 +37,23 @@ class _ListToDoScreenState extends State<ListToDoScreen> {
       print('Error: $e');
     }
   }
+
+  // Future<void> getData() async {
+  //   try {
+  //     Response<String> response =
+  //         await Dio().get('https://jsonplaceholder.typicode.com/todos');
+
+  //     if (response.statusCode == 200) {
+  //       List<dynamic> jsonData = json.decode(response.data!);
+  //       setState(() {
+  //         itemToDo = jsonData;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     // ignore: avoid_print
+  //     print('Error: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -54,11 +68,11 @@ class _ListToDoScreenState extends State<ListToDoScreen> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: itemToDo.length,
+                itemCount: itemsToDo.length,
                 itemBuilder: (BuildContext context, int index) {
                   return CardListToDo(
-                    title: itemToDo[index]['title'],
-                    completed: itemToDo[index]['completed'],
+                    title: itemsToDo[index]['title'],
+                    completed: itemsToDo[index]['completed'],
                   );
                 },
               ),
